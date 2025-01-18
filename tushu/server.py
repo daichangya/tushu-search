@@ -5,8 +5,8 @@ import sys
 
 from sanic import Sanic
 from sanic.response import html, redirect
-from sanic_session import RedisSessionInterface,Session
-from aiocache import caches, Cache
+from sanic_session import RedisSessionInterface
+from aiocache import caches
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

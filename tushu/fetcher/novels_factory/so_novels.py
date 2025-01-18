@@ -3,7 +3,7 @@
  Created by howie.hu at 2018/5/28.
 """
 import asyncio
-from aiocache import caches, cached
+from aiocache import caches, cached, Cache
 
 from aiocache.serializers import PickleSerializer
 from bs4 import BeautifulSoup
@@ -80,7 +80,7 @@ class SoNovels(BaseNovels):
             return []
 
 
-@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name")
+@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name",cache=Cache.REDIS)
 async def start(novels_name):
     """
     Start spider

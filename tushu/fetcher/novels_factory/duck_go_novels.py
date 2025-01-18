@@ -74,7 +74,7 @@ class DuckGoNovels(BaseNovels):
             return []
 
 
-@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name")
+@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name",cache=Cache.REDIS)
 async def start(novels_name):
     """
     Start spider
