@@ -1,24 +1,71 @@
 {% extends "main.html" %}
 
 {% block header %}
-<title>feedback - owllook</title>
-<style>
-    pre {
-        white-space: pre-wrap;
-        word-wrap: break-word;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户反馈页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
     }
-</style>
+
+  .container {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+  .qrcode {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 15px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <br>
-    <br>
-    <pre>
 
-        您好，如果您对<a href="/">本站</a>有什么建议，请输入您的意见，本站一定慎重考虑，最后，感谢您对本站的反馈。
-        若您有更多的意见或者想大家一起交流，请看<qq style="color: red;" value="591460519">这里</qq>加群（能找到隐藏的入口就进来~）。
-    </pre>
+<div class="container">
+     <h1>欢迎反馈您的意见</h1>
+    <p>非常感谢您对我们的关注与支持！为了能更好地服务您，请通过扫描下方二维码关注我们的公众号，在公众号内进行反馈。</p>
+    <img src="http://images.zthinker.com/qrcode_for_gh_1e2587cc42b1_258_1587996055777.jpg" alt="反馈公众号二维码" class="qrcode">
+    <button onclick="window.open('https://mp.weixin.qq.com/')">前往微信公众号</button>
+    <button onclick="window.open('/')">返回首页</button>
     {% include "comment.html" %}
 </div>
 {% endblock %}
