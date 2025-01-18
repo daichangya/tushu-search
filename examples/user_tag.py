@@ -9,15 +9,15 @@ os.environ['MODE'] = 'PRO'
 from pprint import pprint
 from urllib.parse import parse_qs, urlparse
 
-from owllook.database.mongodb import MotorBase
-from owllook.fetcher.function import get_time
+from tushu.database.mongodb import MotorBase
+from tushu.fetcher.function import get_time
 
 # mongo
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
 MONGODB_USERNAME = ""
 MONGODB_PASSWORD = ""
-MONGODB_DB = "owllook"
+MONGODB_DB = "tushu"
 MONGODB_COLLECTION = "all_novels_info"
 
 

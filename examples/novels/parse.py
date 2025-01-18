@@ -6,7 +6,7 @@ import uvloop
 
 from pprint import pprint
 
-from owllook.fetcher.function import target_fetch
+from tushu.fetcher.function import target_fetch
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 

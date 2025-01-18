@@ -4,7 +4,7 @@ import os
 import uvloop
 
 os.environ['MODE'] = 'PRO'
-from owllook.fetcher.cache import update_all_books
+from tushu.fetcher.cache import update_all_books
 
 
 def update_all():

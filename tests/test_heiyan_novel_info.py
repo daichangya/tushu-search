@@ -10,7 +10,7 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from owllook.spiders.heiyan_novel_info import HYNovelInfoItem
+from tushu.spiders.heiyan_novel_info import HYNovelInfoItem
 
 HTML = """
 <!doctype html> 

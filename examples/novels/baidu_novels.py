@@ -8,8 +8,8 @@ import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-from owllook.fetcher.function import get_random_user_agent
-from owllook.config import CONFIG, LOGGER, BLACK_DOMAIN, RULES, LATEST_RULES
+from tushu.fetcher.function import get_random_user_agent
+from tushu.config import CONFIG, LOGGER, BLACK_DOMAIN, RULES, LATEST_RULES
 
 
 async def fetch(client, url, name, is_web):

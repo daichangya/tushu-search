@@ -10,9 +10,9 @@ os.environ['MODE'] = 'DEV'
 
 from pprint import pprint
 from copy import deepcopy
-from owllook.database.mongodb import MotorBase
-from owllook.recommend.cosinesimilarity import CosineSimilarity
-from owllook.fetcher.function import get_time
+from tushu.database.mongodb import MotorBase
+from tushu.recommend.cosinesimilarity import CosineSimilarity
+from tushu.fetcher.function import get_time
 
 
 async def get_user_tag():
