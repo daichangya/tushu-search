@@ -35,7 +35,7 @@ def close_connection(operate_bp, loop):
 
 # jinjia2 config
 env = Environment(
-    loader=PackageLoader('owllook.views.operate_blueprint', '../templates/operate'),
+    # loader=PackageLoader('owllook.views.operate_blueprint', '../templates/operate'),
     autoescape=select_autoescape(['html', 'xml', 'tpl']))
 
 
@@ -57,7 +57,7 @@ async def author_notification(request):
         :   0   操作失败
         :   1   操作成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     user_data = parse_qs(str(request.body, encoding='utf-8'))
     if user:
         try:
@@ -115,7 +115,7 @@ async def change_email(request):
         :   0   修改邮箱失败
         :   1   添加邮箱成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     if user:
         try:
@@ -143,7 +143,7 @@ async def change_pass(request):
         :   1   添加密码成功
         :   -2  原始密码错误
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     if user:
         try:
@@ -180,7 +180,7 @@ async def owllook_add_book(request):
         :   0   添加书架失败
         :   1   添加书架成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     novels_name = data.get('novels_name', '')
     chapter_url = data.get('chapter_url', '')
@@ -217,7 +217,7 @@ async def owllook_add_bookmark(request):
         :   0   添加书签失败
         :   1   添加书签成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     bookmark_url = data.get('bookmark_url', '')
     if user and bookmark_url:
@@ -250,7 +250,7 @@ async def owllook_delete_book(request):
         :   0   删除书架失败
         :   1   删除书架成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     if user:
         if data.get('book_url', None):
@@ -283,7 +283,7 @@ async def owllook_delete_bookmark(request):
         :   0   删除书签失败
         :   1   删除书签成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     data = parse_qs(str(request.body, encoding='utf-8'))
     bookmarkurl = data.get('bookmarkurl', '')
     if user and bookmarkurl:
@@ -324,11 +324,11 @@ async def owllook_login(request):
                 response = json({'status': 1})
                 # 将session_id存于cokies
                 date = datetime.datetime.now()
-                response.cookies['owl_sid'] = request['session'].sid
+                response.cookies['owl_sid'] = request.ctx.session.sid
                 response.cookies['owl_sid']['expires'] = date + datetime.timedelta(days=30)
                 response.cookies['owl_sid']['httponly'] = True
                 # 此处设置存于服务器session的user值
-                request['session']['user'] = user
+                request.ctx.session['user'] = user
                 # response.cookies['user'] = user
                 # response.cookies['user']['expires'] = date + datetime.timedelta(days=30)
                 # response.cookies['user']['httponly'] = True
@@ -351,7 +351,7 @@ async def owllook_logout(request):
         :   0   退出失败
         :   1   退出成功
     """
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         response = json({'status': 1})
         del response.cookies['user']
@@ -393,7 +393,7 @@ async def owllook_register(request):
                     "email": email,
                     "register_time": time,
                 }
-                await motor_db.user.save(data)
+                await motor_db.user.insert_one(data)
                 return json({'status': 1})
             else:
                 return json({'status': -2})

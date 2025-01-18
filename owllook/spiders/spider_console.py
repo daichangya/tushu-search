@@ -4,7 +4,7 @@ import schedule
 import sys
 import time
 
-os.environ['MODE'] = 'PRO'
+# os.environ['MODE'] = 'PRO'
 sys.path.append('../../')
 
 from owllook.spiders import QidianRankingSpider, ZHRankingSpider

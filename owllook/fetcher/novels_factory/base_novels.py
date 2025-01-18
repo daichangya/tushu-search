@@ -4,6 +4,8 @@
 """
 import aiohttp
 import async_timeout
+import requests
+import charset_normalizer
 
 from owllook.config import CONFIG, LOGGER, BLACK_DOMAIN, RULES, LATEST_RULES
 
@@ -21,27 +23,26 @@ class BaseNovels:
         self.rules = RULES
 
     async def fetch_url(self, url, params, headers):
-        """
-        公共抓取函数
-        :param client:
-        :param url:
-        :param params:
-        :return:
-        """
-        with async_timeout.timeout(15):
-            try:
-                async with aiohttp.ClientSession() as client:
-                    async with client.get(url, params=params, headers=headers) as response:
-                        assert response.status == 200
-                        LOGGER.info('Task url: {}'.format(response.url))
-                        try:
-                            text = await response.text()
-                        except:
-                            text = await response.read()
-                        return text
-            except Exception as e:
-                LOGGER.exception(e)
-                return None
+        try:
+            response = requests.get(url, params=params,headers=headers, timeout=10)
+            response.raise_for_status()
+
+            # 获取Content-Type并检查是否为HTML
+            content_type = response.headers.get('Content-Type', '')
+            if 'text/html' not in content_type:
+                raise Exception("搜索结果页面非HTML内容")
+
+            # 使用charset-normalizer检测编码
+            detected = charset_normalizer.from_bytes(response.content).best()
+            encoding = detected.encoding if detected and detected.encoding else 'utf-8'
+
+            # 使用检测到的编码解码内容
+            text = response.content.decode(encoding, errors='replace')
+            return text
+        except requests.RequestException as e:
+            raise Exception(f"请求百度失败：{e}")
+        except Exception as e:
+            raise Exception(f"解码百度搜索结果页面失败：{e}")
 
     @classmethod
     async def start(cls, novels_name):

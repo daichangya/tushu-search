@@ -16,13 +16,16 @@ from owllook.config import CONFIG, LOGGER, BLACK_DOMAIN, RULES, LATEST_RULES
 async def fetch(client, url, novels_name):
     with async_timeout.timeout(20):
         try:
+            url = f"https://cn.bing.com/search?q={novels_name}&count=20"
             headers = {
-                'user-agent': await get_random_user_agent(),
-                'referer': "https://www.bing.com/"
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/113.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
             }
-            print(headers)
-            params = {'q': novels_name, 'ensearch': 0}
-            async with client.get(url, params=params, headers=headers) as response:
+            async with client.get(url, params=None, headers=headers) as response:
                 assert response.status == 200
                 LOGGER.info('Task url: {}'.format(response.url))
                 try:
@@ -109,6 +112,6 @@ if __name__ == '__main__':
 
 
     start = time.time()
-    result = novel_task('牧神记 小说 阅读 最新章节')
+    result = novel_task('肝出个大器晚成 小说 阅读 最新章节')
     pprint(result)
     print(time.time() - start)

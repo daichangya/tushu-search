@@ -2,15 +2,18 @@
 """
  Created by howie.hu at 2018/5/28.
 """
-import aiohttp
+import urllib
+
+from aiocache import caches, cached
 import asyncio
 import async_timeout
+import requests
 
 from aiocache.serializers import PickleSerializer
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-from owllook.fetcher.decorators import cached
+from aiocache import cached
 from owllook.fetcher.function import get_random_user_agent
 from owllook.fetcher.novels_factory.base_novels import BaseNovels
 
@@ -33,7 +36,8 @@ class BaiduNovels(BaseNovels):
                 netloc = urlparse(real_str_url).netloc
                 if "http://" + netloc + "/" == real_str_url:
                     return None
-                if 'baidu' in real_str_url or netloc in self.black_domain:
+                if (not real_url or 'qidian.com' in real_url or 'qq.com' in real_url or 'baidu' in real_url or 'baike.so.com' in real_url
+                        or netloc in self.black_domain):
                     return None
                 is_parse = 1 if netloc in self.rules.keys() else 0
                 title = html.select('h3.t a')[0].get_text()
@@ -59,27 +63,46 @@ class BaiduNovels(BaseNovels):
         :param url:
         :return:
         """
-        with async_timeout.timeout(5):
-            try:
-                async with aiohttp.ClientSession() as client:
-                    headers = {'user-agent': await get_random_user_agent()}
-                    async with client.head(url, headers=headers, allow_redirects=True) as response:
-                        self.logger.info('Parse url: {}'.format(response.url))
-                        url = response.url if response.url else None
-                        return url
-            except Exception as e:
-                self.logger.exception(e)
-                return None
+        try:
+            headers = {'user-agent': await get_random_user_agent()}
+            response = requests.head(url, params=None, headers=headers,allow_redirects=True, timeout=20)
+            self.logger.info('Parse url: {}'.format(response.url))
+            url = response.url if response.url else None
+            return url
+        except requests.RequestException as e:
+            raise Exception(f"请求百度失败：{e}")
+        except Exception as e:
+            raise Exception(f"解码百度搜索结果页面失败：{e}")
+
+        # with async_timeout.timeout(5):
+        #     try:
+        #         async with aiohttp.ClientSession() as client:
+        #             headers = {'user-agent': await get_random_user_agent()}
+        #             async with client.head(url, headers=headers, allow_redirects=True) as response:
+        #                 self.logger.info('Parse url: {}'.format(response.url))
+        #                 url = response.url if response.url else None
+        #                 return url
+        #     except Exception as e:
+        #         self.logger.exception(e)
+        #         return None
 
     async def novels_search(self, novels_name):
         """
         小说搜索入口函数
         :return:
         """
-        url = self.config.URL_PC
-        params = {'wd': novels_name, 'ie': 'utf-8', 'rn': self.config.BAIDU_RN, 'vf_bl': 1}
-        headers = {'user-agent': await get_random_user_agent()}
-        html = await self.fetch_url(url=url, params=params, headers=headers)
+        query_encoded = urllib.parse.quote_plus(novels_name)
+        url = f"https://www.baidu.com/s?wd={query_encoded}&rn=20&ie=utf-8"
+
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/113.0.0.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        }
+        html = await self.fetch_url(url=url,params=None, headers=headers)
         if html:
             soup = BeautifulSoup(html, 'html5lib')
             result = soup.find_all(class_='result')
@@ -92,7 +115,7 @@ class BaiduNovels(BaseNovels):
             return []
 
 
-@cached(ttl=259200, key_from_attr='novels_name', serializer=PickleSerializer(), namespace="novels_name")
+@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name")
 async def start(novels_name):
     """
     Start spider
@@ -106,12 +129,19 @@ if __name__ == '__main__':
     import aiocache
 
     REDIS_DICT = {}
-    aiocache.settings.set_defaults(
-        class_="aiocache.RedisCache",
-        endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-        port=REDIS_DICT.get('REDIS_PORT', 6379),
-        db=REDIS_DICT.get('CACHE_DB', 0),
-        password=REDIS_DICT.get('REDIS_PASSWORD', None),
-    )
+    caches.set_config({
+        "default": {
+            "cache": "aiocache.backends.redis.RedisBackend",
+            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+            "port": REDIS_DICT.get('REDIS_PORT', 6379),
+            "db": REDIS_DICT.get('CACHE_DB', 0),
+            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
+            "timeout": 10,
+            "serializer": {
+                "class": "aiocache.serializers.JsonSerializer"
+            }
+        }
+    })
     res = asyncio.get_event_loop().run_until_complete(start('intitle:雪中悍刀行 小说 阅读'))
-    print(res)
+    for i in res:
+        print(i)

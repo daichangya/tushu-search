@@ -13,20 +13,20 @@ from aiocache.serializers import PickleSerializer, JsonSerializer
 from urllib.parse import urlparse, parse_qs, urljoin
 
 from owllook.database.mongodb import MotorBase
-from owllook.fetcher.decorators import cached
-from owllook.fetcher.function import target_fetch, get_time, get_html_by_requests, get_random_user_agent
+from aiocache import cached, RedisCache
+from owllook.fetcher.function import target_fetch, get_time, get_html_by_requests, get_random_user_agent,target_fetch_by_list
 from owllook.fetcher.extract_novels import extract_pre_next_chapter
 from owllook.config import RULES, LATEST_RULES, LOGGER
 
 
-@cached(ttl=300, key_from_attr='url', serializer=PickleSerializer(), namespace="main")
+@cached(ttl=300,  serializer=PickleSerializer(), namespace="main")
 async def cache_owllook_novels_content(url, chapter_url,netloc):
     headers = {
         'user-agent': await get_random_user_agent()
     }
-    html = await target_fetch(headers=headers, url=url)
-    if not html:
-        html = get_html_by_requests(url=url, headers=headers)
+    # html = await target_fetch(headers=headers, url=url)
+    # if not html:
+    html = get_html_by_requests(url=url, headers=headers)
     if html:
         soup = BeautifulSoup(html, 'html5lib')
         selector = RULES[netloc].content_selector
@@ -64,33 +64,49 @@ async def cache_owllook_novels_content(url, chapter_url,netloc):
     return None
 
 
-@cached(ttl=300, key_from_attr='url', serializer=PickleSerializer(), namespace="main")
+@cached(ttl=300,  serializer=PickleSerializer(), namespace="main")
 async def cache_owllook_novels_chapter(url, netloc):
     headers = {
         'user-agent': await get_random_user_agent()
     }
-    html = await target_fetch(headers=headers, url=url)
-    if not html:
+    all_html = await target_fetch_by_list(headers=headers, url=url)
+    all_content = []
+    if not all_html :
         html = get_html_by_requests(url=url, headers=headers)
-    if html:
-        soup = BeautifulSoup(html, 'html5lib')
-        selector = RULES[netloc].chapter_selector
-        if selector.get('id', None):
-            content = soup.find_all(id=selector['id'])
-        elif selector.get('class', None):
-            content = soup.find_all(class_=selector['class'])
-        else:
-            content = soup.find_all(selector.get('tag'))
-        # 防止章节被display:none
-        return str(content).replace('style', '') if content else None
-    return None
+        all_html.append(html)
+    selector = RULES[netloc].chapter_selector
+    for html in all_html:
+        if html:
+            soup = BeautifulSoup(html, 'html5lib')
+            if selector.get('id', None):
+                content = soup.find_all(id=selector['id'])
+            elif selector.get('class', None):
+                content = soup.find_all(class_=selector['class'])
+            else:
+                content = soup.find_all(selector.get('tag'))
+            # 防止章节被display:none
+            #如果item 里面不包括关键字 章 就删除
+            content = filter_chapters(content)
+            all_content.extend(content)
+    if not all_content:
+        return None
+    return str(all_content).replace('style', '') if all_content else None
 
+def filter_chapters(chapter_list):
+    filtered_list = []
+    for item in chapter_list:
+        content = str(item)
+        pattern = re.compile(r'(第\s*[零一二三四五六七八九十百千万\d]+\s*(章|回|卷|节|折|篇|幕|集).*)')
+        match = re.search(pattern, content)
+        if match:
+            filtered_list.append(item)
+    return filtered_list
 
-@cached(ttl=10800, key_from_attr='search_ranking', serializer=JsonSerializer(), namespace="ranking")
+@cached(ttl=10800,  serializer=JsonSerializer(), namespace="ranking")
 async def cache_owllook_search_ranking():
     motor_db = MotorBase().get_db()
     keyword_cursor = motor_db.search_records.find(
-        {'count': {'$gte': 50}},
+        {'count': {'$gte': 5}},
         {'keyword': 1, 'count': 1, '_id': 0}
     ).sort('count', -1).limit(35)
     result = []
@@ -101,7 +117,7 @@ async def cache_owllook_search_ranking():
     return result
 
 
-@cached(ttl=3600, key_from_attr='search_ranking', serializer=JsonSerializer(), namespace="ranking")
+@cached(ttl=3600,  serializer=JsonSerializer(), namespace="ranking")
 async def cache_others_search_ranking(spider='qidian', novel_type='全部类别'):
     motor_db = MotorBase().get_db()
     item_data = await motor_db.novels_ranking.find_one({'spider': spider, 'type': novel_type}, {'data': 1, '_id': 0})

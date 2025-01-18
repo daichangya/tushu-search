@@ -5,11 +5,12 @@ import sys
 
 from sanic import Sanic
 from sanic.response import html, redirect
-from sanic_session import RedisSessionInterface
+from sanic_session import RedisSessionInterface,Session
+from aiocache import caches, Cache
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from owllook.views import admin_bp, api_bp, except_bp, md_bp, novels_bp, operate_bp
+from owllook.views import admin_bp, api_bp, except_bp, md_bp, novels_bp,operate_bp
 from owllook.database.redis import RedisSession
 from owllook.config import LOGGER, CONFIG
 
@@ -27,21 +28,37 @@ def init_cache(app, loop):
     LOGGER.info("Starting aiocache")
     app.config.from_object(CONFIG)
     REDIS_DICT = CONFIG.REDIS_DICT
-    aiocache.settings.set_defaults(
-        class_="aiocache.RedisCache",
-        endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-        port=REDIS_DICT.get('REDIS_PORT', 6379),
-        db=REDIS_DICT.get('CACHE_DB', 0),
-        password=REDIS_DICT.get('REDIS_PASSWORD', None),
-        loop=loop,
-    )
+    caches.set_config({
+        "default": {
+            "cache": "aiocache.backends.redis.RedisBackend",
+            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+            "port": REDIS_DICT.get('REDIS_PORT', 6379),
+            "db": REDIS_DICT.get('CACHE_DB', 0),
+            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
+            "timeout": 10,
+            "serializer": {
+                "class": "aiocache.serializers.JsonSerializer"
+            }
+        }
+    })
+    # aiocache.settings.set_defaults(
+    #     class_="aiocache.RedisCache",
+    #     endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+    #     port=REDIS_DICT.get('REDIS_PORT', 6379),
+    #     db=REDIS_DICT.get('CACHE_DB', 0),
+    #     password=REDIS_DICT.get('REDIS_PASSWORD', None),
+    #     loop=loop,
+    # )
     LOGGER.info("Starting redis pool")
     redis_session = RedisSession()
+    # 配置 sanic_session 使用 Redis 存储会话
+    # app.session_interface = RedisSessionInterface(redis_getter=redis_session.get_redis, prefix='session:')
+    # Session(app, interface=session_interface)
     # redis instance for app
-    app.get_redis_pool = redis_session.get_redis_pool
+    # app.get_redis_pool = redis_session.get_redis_pool
     # pass the getter method for the connection pool into the session
     app.session_interface = RedisSessionInterface(
-        app.get_redis_pool, cookie_name="owl_sid", expiry=30 * 24 * 60 * 60)
+        redis_session.get_redis, cookie_name="owl_sid", expiry=30 * 24 * 60 * 60)
 
 
 @app.middleware('request')
@@ -71,18 +88,18 @@ async def save_session(request, response):
     # after each request save the session,
     # pass the response to set client cookies
     # await app.session_interface.save(request, response)
-    if request.path == '/operate/login' and request['session'].get('user', None):
+    if request.path == '/operate/login' and request.ctx.session.get('user', None):
         await app.session_interface.save(request, response)
         import datetime
         response.cookies['owl_sid']['expires'] = datetime.datetime.now(
         ) + datetime.timedelta(days=30)
     elif request.path == '/register':
         try:
-            response.cookies['reg_index'] = str(request['session']['index'][0])
+            response.cookies['reg_index'] = str(request.ctx.session['index'][0])
         except KeyError as e:
             LOGGER.error(e)
 
 
 if __name__ == "__main__":
     workers = 1 if os.name == 'nt' else 2
-    app.run(host="0.0.0.0", workers=workers, port=8001, debug=CONFIG.DEBUG)
+    app.run(host="0.0.0.0", port=8001, debug=CONFIG.DEBUG)

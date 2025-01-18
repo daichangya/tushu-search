@@ -23,7 +23,7 @@ loop = asyncio.get_event_loop()
 
 
 def start_spider():
-    QidianRankingSpider.start()
+    # QidianRankingSpider.start()
     ZHRankingSpider.start()
 
 

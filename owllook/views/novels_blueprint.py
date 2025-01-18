@@ -56,6 +56,7 @@ async def chapter(request):
         return redirect(url)
     if netloc in REPLACE_RULES.keys():
         url = url.replace(REPLACE_RULES[netloc]['old'], REPLACE_RULES[netloc]['new'])
+    url = index_url_change(url)
     content_url = RULES[netloc].content_url
     content = await cache_owllook_novels_chapter(url=url, netloc=netloc)
     if content:
@@ -66,6 +67,21 @@ async def chapter(request):
     else:
         return text('解析失败，请将失败页面反馈给本站，请重新刷新一次，或者访问源网页：{url}'.format(url=url))
 
+def index_url_change(url):
+    # if True:
+    #     return url
+    # url 如果html 结尾 返回 url
+    if url.endswith('.html'):
+        return url
+    if 'xiguasuwu.com' not in url:
+        return url
+    # 提取小说ID部分
+    base_url = url.rstrip('/')
+    novel_id = base_url.split('/')[-1]
+    category_id = base_url.split('/')[-2]
+
+    # 构建url3
+    return f'https://www.xiguasuwu.com/indexlist/{category_id}/{novel_id}/1.html'
 
 @novels_bp.route("/owllook_donate")
 async def donate(request):
@@ -79,7 +95,7 @@ async def feedback(request):
 
 @novels_bp.route("/")
 async def index(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     search_ranking = await cache_owllook_search_ranking()
     if user:
         return template('index.html', title='owllook - 网络小说搜索引擎', is_login=1, user=user,
@@ -107,7 +123,7 @@ async def owllook_content(request):
     netloc = get_netloc(url)
     if netloc not in RULES.keys():
         return redirect(url)
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     # 拼接小说目录url
     book_url = "/chapter?url={chapter_url}&novels_name={novels_name}".format(
         chapter_url=chapter_url,
@@ -236,13 +252,14 @@ async def owllook_register(request):
         :   0   用户名或密码错误
         :   1   登陆成功
     """
-    user = request['session'].get('user', None)
+    # user = request.ctx.session.get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         return redirect('/')
     else:
         ver_que_ans = ver_question()
         if ver_que_ans:
-            request['session']['index'] = ver_que_ans
+            request.ctx.session['index'] = ver_que_ans
             return template(
                 'register.html',
                 title='owllook - 注册 - 网络小说搜索引擎',
@@ -318,7 +335,9 @@ async def owllook_search(request):
             parse_result,
             reverse=True,
             key=itemgetter('is_recommend', 'is_parse', 'timestamp'))
-        user = request['session'].get('user', None)
+        for each_result in result_sorted:
+            print(each_result)
+        user = request.ctx.session.get('user', None)
         if user:
             try:
                 time_current = get_time()

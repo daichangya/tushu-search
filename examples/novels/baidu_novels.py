@@ -13,24 +13,26 @@ from owllook.config import CONFIG, LOGGER, BLACK_DOMAIN, RULES, LATEST_RULES
 
 
 async def fetch(client, url, name, is_web):
-    with async_timeout.timeout(15):
-        try:
-            headers = {'user-agent': await get_random_user_agent()}
-            if is_web:
-                params = {'wd': name, 'ie': 'utf-8', 'rn': CONFIG.BAIDU_RN, 'vf_bl': 1}
-            else:
-                params = {'word': name}
-            async with client.get(url, params=params, headers=headers) as response:
-                assert response.status == 200
-                LOGGER.info('Task url: {}'.format(response.url))
-                try:
-                    text = await response.text()
-                except:
-                    text = await response.read()
-                return text
-        except Exception as e:
-            LOGGER.exception(e)
-            return None
+    try:
+        async with async_timeout.timeout(15):
+            async with aiohttp.ClientSession() as session:
+                headers = {'user-agent': await get_random_user_agent()}
+                if is_web:
+                    params = {'wd': name, 'ie': 'utf-8', 'rn': CONFIG.BAIDU_RN, 'vf_bl': 1}
+                else:
+                    params = {'word': name}
+                async with session.get(url, params=params, headers=headers) as response:
+                    assert response.status == 200
+                    LOGGER.info('Task url: {}'.format(response.url))
+                    try:
+                        text = await response.text()
+                    except:
+                        text = await response.read()
+                    return text
+    except asyncio.TimeoutError:
+        print("Fetch URL timed out")
+    except aiohttp.ClientError as e:
+        print(f"Client error occurred: {e}")
 
 
 async def get_real_url(client, url):

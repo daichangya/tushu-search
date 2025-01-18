@@ -2,7 +2,7 @@
 """
  Created by howie.hu at 2018/5/28.
 """
-
+from aiocache import caches, cached
 from importlib import import_module
 
 
@@ -19,13 +19,19 @@ if __name__ == '__main__':
     import aiocache
 
     REDIS_DICT = {}
-    aiocache.settings.set_defaults(
-        class_="aiocache.RedisCache",
-        endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-        port=REDIS_DICT.get('REDIS_PORT', 6379),
-        db=REDIS_DICT.get('CACHE_DB', 0),
-        password=REDIS_DICT.get('REDIS_PASSWORD', None),
-    )
+    caches.set_config({
+        "default": {
+            "cache": "aiocache.backends.redis.RedisBackend",
+            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+            "port": REDIS_DICT.get('REDIS_PORT', 6379),
+            "db": REDIS_DICT.get('CACHE_DB', 0),
+            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
+            "timeout": 10,
+            "serializer": {
+                "class": "aiocache.serializers.JsonSerializer"
+            }
+        }
+    })
 
     res = asyncio.get_event_loop().run_until_complete(
         get_novels_info(class_name='baidu', novels_name='intitle:雪中悍刀行 小说 阅读'))

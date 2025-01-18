@@ -6,20 +6,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="alert alert-warning center-block">
-    <p class="close" style="position: absolute;right: 10px;" data-dismiss="alert">
-        &times;
-    </p>
-    <p style="text-align: center">
-        <a href="https://mp.weixin.qq.com/s?__biz=MzAwNzQxODkyMA==&mid=2247483836&idx=1&sn=7bcd79a8c6e795537d333a678af288d8&chksm=9b7f24fbac08adedf68eed8611a09417e4360c8e810857ec80ea384fe1d13c607d6f3b8fb3ba&token=1185005976&lang=zh_CN#rd">【福利】在微信群里面查找&追更小说</a>
-    </p>
-</div>
+<!--<div class="alert alert-warning center-block">-->
+<!--    <p class="close" style="position: absolute;right: 10px;" data-dismiss="alert">-->
+<!--        &times;-->
+<!--    </p>-->
+<!--    <p style="text-align: center">-->
+<!--        <a href="https://mp.weixin.qq.com/s?__biz=MzAwNzQxODkyMA==&mid=2247483836&idx=1&sn=7bcd79a8c6e795537d333a678af288d8&chksm=9b7f24fbac08adedf68eed8611a09417e4360c8e810857ec80ea384fe1d13c607d6f3b8fb3ba&token=1185005976&lang=zh_CN#rd">【福利】在微信群里面查找&追更小说</a>-->
+<!--    </p>-->
+<!--</div>-->
 <div class="header">
-    <a target="_blank" href="https://github.com/howie6879/owllook"><img
-            style="position: absolute; top: 0; left: 0; border: 0;"
-            src="static/novels/img/github_owl.png"
-            alt="Fork me on GitHub"
-            data-canonical-src="static/novels/img/github_owl.png"></a>
+<!--    <a target="_blank" href="https://github.com/howie6879/owllook"><img-->
+<!--            style="position: absolute; top: 0; left: 0; border: 0;"-->
+<!--            src="static/novels/img/github_owl.png"-->
+<!--            alt="Fork me on GitHub"-->
+<!--            data-canonical-src="static/novels/img/github_owl.png"></a>-->
     {% if is_login %}
     {% include "login.html" %}
     {% else %}
@@ -30,12 +30,12 @@
 </div>
 <div class="container">
     <div class="logo">
-        <img class="img-responsive center-block" src="static/novels/img/logo_home.png" alt="owllook">
+        <img class="img-responsive center-block" src="static/novels/img/tushu_searchz.png" alt="owllook">
     </div>
     <form action="/search" method="get" class="home_search center-block">
         <div class="search center-block">
             <input type="text" name="wd" class="form-control center-block" placeholder="请输入小说名">
-            <input class="btn btn-default" type="submit" value="Owl Search">
+            <input class="btn btn-default" type="submit" value="Book Search">
         </div>
     </form>
     <div class="owl_search_ranking center-block">

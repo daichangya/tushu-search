@@ -31,7 +31,7 @@ class ZHRankingSpider(Spider):
         result = []
         res_dic = {}
 
-        async for item in RankingItem.get_items(html=res.html):
+        async for item in RankingItem.get_items(url=res.url):
             each_book_list = []
             # 只取排名前十的书籍数据
             for index, value in enumerate(item.book_list[:10]):

@@ -28,10 +28,10 @@ class Config():
 
     # Engine config
     URL_PHONE = 'https://m.baidu.com/s'
-    URL_PC = 'http://www.baidu.com/s'
+    URL_PC = 'https://www.baidu.com/s'
     BAIDU_RN = 15
     SO_URL = "https://www.so.com/s"
-    BY_URL = "https://www.bing.com/search"
+    BY_URL = "https://cn.bing.com/search"
     DUCKGO_URL = "https://duckduckgo.com/html"
 
     REMOTE_SERVER = {

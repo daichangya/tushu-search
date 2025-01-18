@@ -8,7 +8,7 @@ from aiocache.serializers import PickleSerializer
 from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, urlparse
 
-from owllook.fetcher.decorators import cached
+from aiocache import cached
 from owllook.fetcher.function import get_random_user_agent
 from owllook.fetcher.novels_factory.base_novels import BaseNovels
 
@@ -74,7 +74,7 @@ class DuckGoNovels(BaseNovels):
             return []
 
 
-@cached(ttl=259200, key_from_attr='novels_name', serializer=PickleSerializer(), namespace="novels_name")
+@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name")
 async def start(novels_name):
     """
     Start spider

@@ -37,7 +37,7 @@ def template(tpl, **kwargs):
 
 @admin_bp.route("/bookmarks")
 async def bookmarks(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -77,7 +77,7 @@ async def bookmarks(request):
 
 @admin_bp.route("/books")
 async def books(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -125,7 +125,7 @@ async def books(request):
 
 @admin_bp.route("/lcxs")
 async def lcxs(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         return template('admin_lcxs.html',
                         is_login=1,
@@ -136,7 +136,7 @@ async def lcxs(request):
 
 @admin_bp.route("/search_user")
 async def search_user(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     name = request.args.get('ss', None)
     if user and name:
         try:
@@ -186,7 +186,7 @@ async def search_user(request):
 
 @admin_bp.route("/similar_user")
 async def similar_user(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()

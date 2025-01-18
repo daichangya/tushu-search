@@ -37,7 +37,7 @@ def template(tpl, **kwargs):
 
 @md_bp.route("/setting")
 async def admin_setting(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -59,7 +59,7 @@ async def admin_setting(request):
 
 @md_bp.route("/zh_bd_novels")
 async def bd_novels(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     first_type_title = "纵横百度小说月票榜"
     first_type = []
     title = "owllook - 纵横百度小说月票榜"
@@ -88,7 +88,7 @@ async def bd_novels(request):
 
 @md_bp.route("/book_list")
 async def book_list(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             return template('admin_book_list.html', title='{user}的书单 - owllook'.format(user=user),
@@ -103,7 +103,7 @@ async def book_list(request):
 
 @md_bp.route("/bookmarks")
 async def bookmarks(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -144,7 +144,7 @@ async def bookmarks(request):
 
 @md_bp.route("/books")
 async def books(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -195,7 +195,7 @@ async def books(request):
 
 @md_bp.route("/")
 async def index(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     novels_head = ['#', '小说名', '搜索次数']
     first_type_title = "搜索排行"
     first_type = []
@@ -210,7 +210,7 @@ async def index(request):
 
 @md_bp.route("/noti_book")
 async def noti_book(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -238,7 +238,7 @@ async def noti_book(request):
 
 @md_bp.route("/qidian")
 async def qidian(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     novels_type = request.args.get('type', '全部类别').strip()
     first_type_title = "全部类别"
     first_type = [
@@ -289,7 +289,7 @@ async def qidian(request):
 
 @md_bp.route("/similar_user")
 async def similar_user(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     if user:
         try:
             motor_db = motor_base.get_db()
@@ -321,7 +321,7 @@ async def similar_user(request):
 
 @md_bp.route("/zongheng")
 async def zongheng(request):
-    user = request['session'].get('user', None)
+    user = request.ctx.session.get('user', None)
     novels_type = request.args.get('type', '人气榜单').strip()
     first_type_title = "人气榜单"
     first_type = []

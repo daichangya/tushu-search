@@ -3,12 +3,11 @@
  Created by howie.hu at 2018/5/28.
 """
 import asyncio
+from aiocache import caches, cached
 
 from aiocache.serializers import PickleSerializer
 from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, urlparse
-
-from owllook.fetcher.decorators import cached
 from owllook.fetcher.function import get_random_user_agent
 from owllook.fetcher.novels_factory.base_novels import BaseNovels
 
@@ -29,6 +28,7 @@ class SoNovels(BaseNovels):
                 title = html.select('h3 a')[0].get_text()
                 url = html.select('h3 a')[0].get('href', None)
             except Exception as e:
+                print(html)
                 self.logger.exception(e)
                 return None
 
@@ -80,7 +80,7 @@ class SoNovels(BaseNovels):
             return []
 
 
-@cached(ttl=259200, key_from_attr='novels_name', serializer=PickleSerializer(), namespace="novels_name")
+@cached(ttl=259200,  serializer=PickleSerializer(), namespace="novels_name")
 async def start(novels_name):
     """
     Start spider
@@ -92,14 +92,19 @@ async def start(novels_name):
 if __name__ == '__main__':
     # Start
     import aiocache
-
     REDIS_DICT = {}
-    aiocache.settings.set_defaults(
-        class_="aiocache.RedisCache",
-        endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-        port=REDIS_DICT.get('REDIS_PORT', 6379),
-        db=REDIS_DICT.get('CACHE_DB', 0),
-        password=REDIS_DICT.get('REDIS_PASSWORD', None),
-    )
+    caches.set_config({
+        "default": {
+            "cache": "aiocache.backends.redis.RedisBackend",
+            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+            "port": REDIS_DICT.get('REDIS_PORT', 6379),
+            "db": REDIS_DICT.get('CACHE_DB', 0),
+            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
+            "timeout": 10,
+            "serializer": {
+                "class": "aiocache.serializers.JsonSerializer"
+            }
+        }
+    })
     res = asyncio.get_event_loop().run_until_complete(start('雪中悍刀行 小说 最新章节'))
     print(res)
