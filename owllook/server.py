@@ -102,4 +102,4 @@ async def save_session(request, response):
 
 if __name__ == "__main__":
     workers = 1 if os.name == 'nt' else 2
-    app.run(host="0.0.0.0", port=8001, debug=CONFIG.DEBUG)
+    app.run(host="0.0.0.0", port=9200, debug=CONFIG.DEBUG)
