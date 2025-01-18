@@ -13,7 +13,7 @@ from aiocache.serializers import PickleSerializer, JsonSerializer
 from urllib.parse import urlparse, parse_qs, urljoin
 
 from owllook.database.mongodb import MotorBase
-from aiocache import cached, RedisCache
+from aiocache import cached
 from owllook.fetcher.function import target_fetch, get_time, get_html_by_requests, get_random_user_agent,target_fetch_by_list
 from owllook.fetcher.extract_novels import extract_pre_next_chapter
 from owllook.config import RULES, LATEST_RULES, LOGGER
