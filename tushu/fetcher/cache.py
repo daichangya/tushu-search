@@ -87,7 +87,17 @@ async def cache_tushu_novels_chapter(url, netloc):
             all_content.extend(content)
     if not all_content:
         return None
+        # 使用 sorted 函数对 content 进行排序
+    all_content = sorted(all_content, key=extract_href)
     return str(all_content).replace('style', '') if all_content else None
+
+# <li class="cont-li" id="chapter"><a class="name" href="/read/294/294184/298695.html">第六十七章 淬肉小成（求追读求收藏求月票推荐票）</a></li>
+# 提取每个项的 href 链接地址，并根据 href 对 content 进行排序
+def extract_href(item):
+    a_tag = item.find('a')
+    if a_tag and 'href' in a_tag.attrs:
+        return a_tag['href']
+    return None
 
 def filter_chapters(chapter_list):
     filtered_list = []

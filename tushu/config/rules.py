@@ -203,7 +203,7 @@ RULES = {
     # 'www.lingdiankanshu.com': Rules('www.lingdiankanshu.com', {'class': 'box_con'}, {}),
     # 'www.hhlwx.com': Rules('www.hhlwx.co', {'class': 'chapterlist'},{}),
     # 'book.qq.com': Rules('1', {'class': 'list'}, {'id': 'article'}),
-    'www.yunxs.org': Rules('https://www.yunxs.org/', {'id': 'listsss'}, {'class': 'neirong'}),
+    'www.yunxs.org': Rules('https://www.yunxs.org/', {'id': 'chapter'}, {'class': 'neirong'}),
     'www.xiguasuwu.com': Rules('https://www.xiguasuwu.com/', {'class': 'col-sm-4'}, {'id': 'booktxt'}),
     'www.biquwu.cc': Rules('https://www.biquwu.cc/', {'class': 'box_con'}, {'id': 'content'}),
     'www.quyuege.com': Rules('0', {'class': 'mod-article-list'}, {'class': 'page-content'}),
