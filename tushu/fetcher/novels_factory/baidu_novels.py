@@ -4,7 +4,7 @@
 """
 import urllib
 
-from aiocache import caches, cached
+from aiocache import caches, cached, Cache
 import asyncio
 import async_timeout
 import requests
