@@ -67,6 +67,9 @@ class DuckGoNovels(BaseNovels):
             result = soup.find_all(class_='result')
             extra_tasks = [self.data_extraction(html=i) for i in result]
             tasks = [asyncio.ensure_future(i) for i in extra_tasks]
+            # 检查是否添加了任务
+            if not tasks:
+                return []
             done_list, pending_list = await asyncio.wait(tasks)
             res = [task.result() for task in done_list if task.result()]
             return res
