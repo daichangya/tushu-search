@@ -61,7 +61,7 @@ async def cache_tushu_novels_content(url, chapter_url,netloc):
     return None
 
 
-@cached(ttl=300,   alias='default')
+@cached(ttl=300,alias='default')
 async def cache_tushu_novels_chapter(url, netloc):
     headers = {
         'user-agent': await get_random_user_agent()

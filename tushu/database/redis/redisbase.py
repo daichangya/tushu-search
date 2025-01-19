@@ -4,19 +4,6 @@ from aiocache import caches
 from tushu.config import CONFIG
 
 REDIS_DICT = CONFIG.REDIS_DICT
-caches.set_config({
-        "default": {
-            "cache": "aiocache.backends.redis.RedisBackend",
-            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-            "port": REDIS_DICT.get('REDIS_PORT', 6379),
-            "db": REDIS_DICT.get('CACHE_DB', 0),
-            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
-            "timeout": 10,
-            "serializer": {
-                "class": "aiocache.serializers.JsonSerializer"
-            }
-        }
-    })
 
 
 # Token from https://github.com/subyraman/sanic_session

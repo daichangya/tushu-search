@@ -3,7 +3,7 @@ from collections import namedtuple
 
 #######################################  规则  ###########################################
 # DOMAIN
-BLACK_DOMAIN = []
+BLACK_DOMAIN = ["forum.qdmm.com", "www.qdmm.com"]
 # BLACK_DOMAIN = ['www.17k.com', 'mm.17k.com', 'www.xs8.cn', 'www.zongheng.com', 'yunqi.qq.com', 'chuangshi.qq.com',
 #                 'book.qidian.com', 'www.soduso.com', 'pages.book.qq.com', 'book.km.com', 'www.lread.net',
 #                 'www.0dsw.com', 'www.5200xsb.com', 'www.80txt.com', 'www.sodu.tw', 'www.shuquge.com',
@@ -203,6 +203,7 @@ RULES = {
     # 'www.lingdiankanshu.com': Rules('www.lingdiankanshu.com', {'class': 'box_con'}, {}),
     # 'www.hhlwx.com': Rules('www.hhlwx.co', {'class': 'chapterlist'},{}),
     # 'book.qq.com': Rules('1', {'class': 'list'}, {'id': 'article'}),
+    'www.yunxs.org': Rules('https://www.yunxs.org/', {'id': 'listsss'}, {'class': 'neirong'}),
     'www.xiguasuwu.com': Rules('https://www.xiguasuwu.com/', {'class': 'col-sm-4'}, {'id': 'booktxt'}),
     'www.biquwu.cc': Rules('https://www.biquwu.cc/', {'class': 'box_con'}, {'id': 'content'}),
     'www.quyuege.com': Rules('0', {'class': 'mod-article-list'}, {'class': 'page-content'}),

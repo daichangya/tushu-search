@@ -8,6 +8,24 @@ from sanic_session import RedisSessionInterface
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from tushu.config import CONFIG
+from aiocache import caches
+
+REDIS_DICT = CONFIG.REDIS_DICT
+caches.set_config({
+        "default": {
+            "cache": "aiocache.backends.redis.RedisBackend",
+            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
+            "port": REDIS_DICT.get('REDIS_PORT', 6379),
+            "db": REDIS_DICT.get('CACHE_DB', 0),
+            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
+            "timeout": 10,
+            "serializer": {
+                "class": "aiocache.serializers.JsonSerializer"
+            }
+        }
+    })
+
 from tushu.views import admin_bp, api_bp, except_bp, md_bp, novels_bp,operate_bp
 from tushu.database.redis import get_redis_async
 from tushu.config import LOGGER, CONFIG

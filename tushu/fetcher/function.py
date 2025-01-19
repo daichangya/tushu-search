@@ -97,6 +97,8 @@ def extract_base_url(url):
 async def target_fetch_by_list(url, headers, timeout=15):
     all_html = []
     page_index = 1
+    if not url.endswith('1.html'):
+        return all_html
     while True:
         base_url = extract_base_url(url)
         url = f"{base_url}{page_index}.html"
