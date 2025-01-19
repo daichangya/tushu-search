@@ -1,17 +1,15 @@
 #!/usr/bin/env python
-import aiocache
 import os
 import sys
 
 from sanic import Sanic
 from sanic.response import html, redirect
 from sanic_session import RedisSessionInterface
-from aiocache import caches
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from tushu.views import admin_bp, api_bp, except_bp, md_bp, novels_bp,operate_bp
-from tushu.database.redis import RedisSession
+from tushu.database.redis import get_redis_async
 from tushu.config import LOGGER, CONFIG
 
 app = Sanic(__name__)
@@ -25,32 +23,6 @@ app.blueprint(api_bp)
 
 @app.listener('before_server_start')
 def init_cache(app, loop):
-    LOGGER.info("Starting aiocache")
-    app.config.from_object(CONFIG)
-    REDIS_DICT = CONFIG.REDIS_DICT
-    caches.set_config({
-        "default": {
-            "cache": "aiocache.backends.redis.RedisBackend",
-            "endpoint": REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-            "port": REDIS_DICT.get('REDIS_PORT', 6379),
-            "db": REDIS_DICT.get('CACHE_DB', 0),
-            "password": REDIS_DICT.get('REDIS_PASSWORD', None),
-            "timeout": 10,
-            "serializer": {
-                "class": "aiocache.serializers.JsonSerializer"
-            }
-        }
-    })
-    # aiocache.settings.set_defaults(
-    #     class_="aiocache.RedisCache",
-    #     endpoint=REDIS_DICT.get('REDIS_ENDPOINT', 'localhost'),
-    #     port=REDIS_DICT.get('REDIS_PORT', 6379),
-    #     db=REDIS_DICT.get('CACHE_DB', 0),
-    #     password=REDIS_DICT.get('REDIS_PASSWORD', None),
-    #     loop=loop,
-    # )
-    LOGGER.info("Starting redis pool")
-    redis_session = RedisSession()
     # 配置 sanic_session 使用 Redis 存储会话
     # app.session_interface = RedisSessionInterface(redis_getter=redis_session.get_redis, prefix='session:')
     # Session(app, interface=session_interface)
@@ -58,7 +30,7 @@ def init_cache(app, loop):
     # app.get_redis_pool = redis_session.get_redis_pool
     # pass the getter method for the connection pool into the session
     app.session_interface = RedisSessionInterface(
-        redis_session.get_redis, cookie_name="owl_sid", expiry=30 * 24 * 60 * 60)
+        get_redis_async, cookie_name="owl_sid", expiry=30 * 24 * 60 * 60)
 
 
 @app.middleware('request')
