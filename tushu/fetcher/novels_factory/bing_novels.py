@@ -9,7 +9,7 @@ from aiocache.serializers import PickleSerializer
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-from aiocache import caches, cached
+from aiocache import caches, cached, Cache
 from tushu.fetcher.function import get_random_user_agent
 from tushu.fetcher.novels_factory.base_novels import BaseNovels
 
