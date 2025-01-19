@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import aioredis
 from aiocache import caches
-from werkzeug.sansio.utils import host_is_trusted
-
 from tushu.config import CONFIG
 
 REDIS_DICT = CONFIG.REDIS_DICT
