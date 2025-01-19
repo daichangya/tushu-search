@@ -4,16 +4,14 @@
 """
 
 import re
-from tushu.database.redis import get_redis
 import async_timeout
 
 from bs4 import BeautifulSoup
-from aiocache.serializers import PickleSerializer, JsonSerializer
 
 from urllib.parse import urlparse, parse_qs, urljoin
 
 from tushu.database.mongodb import MotorBase
-from aiocache import cached, Cache, RedisCache
+from aiocache import cached
 from tushu.fetcher.function import target_fetch, get_time, get_html_by_requests, get_random_user_agent,target_fetch_by_list
 from tushu.fetcher.extract_novels import extract_pre_next_chapter
 from tushu.config import RULES, LATEST_RULES, LOGGER
@@ -101,7 +99,7 @@ def filter_chapters(chapter_list):
             filtered_list.append(item)
     return filtered_list
 
-@cached(ttl=10800,  serializer=JsonSerializer(), alias='default')
+@cached(ttl=10800,  alias='default')
 async def cache_tushu_search_ranking():
     motor_db = MotorBase().get_db()
     keyword_cursor = motor_db.search_records.find(
@@ -116,7 +114,7 @@ async def cache_tushu_search_ranking():
     return result
 
 
-@cached(ttl=3600,  serializer=JsonSerializer(), alias='default')
+@cached(ttl=3600,  alias='default')
 async def cache_others_search_ranking(spider='qidian', novel_type='全部类别'):
     motor_db = MotorBase().get_db()
     item_data = await motor_db.novels_ranking.find_one({'spider': spider, 'type': novel_type}, {'data': 1, '_id': 0})
